@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -42,7 +43,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private UsernamePasswordAuthenticationToken createAuthentication(String token) {
-        String email = jwtUtil.extractEmail(token);
-        return new UsernamePasswordAuthenticationToken(email, null, List.of());
+        String email = jwtUtil.extractEmail(token); // Extraire l'email du token
+        String role = jwtUtil.extractRole(token); // Extraire le rôle du token
+
+        // Ajouter le préfixe ROLE_ au rôle
+        String roleWithPrefix = "ROLE_" + role;
+
+        // Créer un objet UsernamePasswordAuthenticationToken avec l'email et le rôle
+        return new UsernamePasswordAuthenticationToken(email, null, List.of(new SimpleGrantedAuthority(roleWithPrefix)));
     }
+
 }

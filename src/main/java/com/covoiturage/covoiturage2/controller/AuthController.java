@@ -1,5 +1,6 @@
 package com.covoiturage.covoiturage2.controller;
 
+import com.covoiturage.covoiturage2.entity.Role;
 import com.covoiturage.covoiturage2.entity.User;
 import com.covoiturage.covoiturage2.repository.UserRepository;
 import com.covoiturage.covoiturage2.security.JwtResponse;
@@ -30,6 +31,10 @@ public class AuthController {
 
     @PostMapping("/signup")
     public String signup(@RequestBody User user) {
+        if (user.getUserType() == null) {
+            user.setUserType(Role.PASSAGER); // Rôle par défaut
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return "User registered successfully!";
@@ -44,12 +49,14 @@ public class AuthController {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             if (passwordEncoder.matches(password, user.getPassword())) {
-                String token = jwtUtil.generateToken(email);
+                // Ajout du rôle de l'utilisateur (user.getUserType()) au token
+                String token = jwtUtil.generateToken(email, user.getUserType().name());
                 return ResponseEntity.ok(new JwtResponse(token));  // Retourne un token JWT
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
     }
+
 
 
 

@@ -27,6 +27,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/auth/signup", "/auth/signin").permitAll() // Autoriser l'accès à signup et signin sans authentification
+                        .requestMatchers("/profile/update").hasAnyRole("ADMIN", "CONDUCTEUR")
+
+
                         .anyRequest().authenticated()) // Les autres requêtes nécessitent un token Bearer valide
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Ajouter le filtre JWT avant le filtre UsernamePasswordAuthenticationFilter
         return http.build();
