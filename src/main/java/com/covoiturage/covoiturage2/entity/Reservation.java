@@ -1,5 +1,6 @@
 package com.covoiturage.covoiturage2.entity;
 
+import com.covoiturage.covoiturage2.entity.BookingStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -10,21 +11,23 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Relation ManyToOne avec l'entité User (passager)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "passenger_id", nullable = false)
-    private User passenger; // Passager qui effectue la réservation
+    private User passenger;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Relation ManyToOne avec l'entité Trajet
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trajet_id", nullable = false)
-    private Trajet trajet; // Trajet réservé
+    private Trajet trajet;
 
-    private String bookingStatus; // Statut de la réservation (ex: confirmée, en attente)
+    @Enumerated(EnumType.STRING)
+    private BookingStatus bookingStatus;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Constructeurs, getters et setters
+    // Constructeurs
     public Reservation() {}
 
-    public Reservation(Long id, User passenger, Trajet trajet, String bookingStatus, LocalDateTime createdAt) {
+    public Reservation(Long id, User passenger, Trajet trajet, BookingStatus bookingStatus, LocalDateTime createdAt) {
         this.id = id;
         this.passenger = passenger;
         this.trajet = trajet;
@@ -37,36 +40,36 @@ public class Reservation {
         return id;
     }
 
-    public User getPassenger() {
-        return passenger;
-    }
-
-    public Trajet getTrajet() {
-        return trajet;
-    }
-
-    public String getBookingStatus() {
-        return bookingStatus;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public User getPassenger() {
+        return passenger;
     }
 
     public void setPassenger(User passenger) {
         this.passenger = passenger;
     }
 
+    public Trajet getTrajet() {
+        return trajet;
+    }
+
     public void setTrajet(Trajet trajet) {
         this.trajet = trajet;
     }
 
-    public void setBookingStatus(String bookingStatus) {
+    public BookingStatus getBookingStatus() {
+        return bookingStatus;
+    }
+
+    public void setBookingStatus(BookingStatus bookingStatus) {
         this.bookingStatus = bookingStatus;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {

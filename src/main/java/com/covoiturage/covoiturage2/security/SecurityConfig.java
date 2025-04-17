@@ -27,7 +27,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/auth/signup", "/auth/signin").permitAll() // Autoriser l'accès à signup et signin sans authentification
+                        .requestMatchers("/reservations").hasRole("PASSAGER")
                         .requestMatchers("/profile/update").hasAnyRole("ADMIN", "CONDUCTEUR")
+
 
 
                         .anyRequest().authenticated()) // Les autres requêtes nécessitent un token Bearer valide

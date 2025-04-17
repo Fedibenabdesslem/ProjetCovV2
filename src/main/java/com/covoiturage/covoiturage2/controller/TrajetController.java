@@ -2,11 +2,13 @@ package com.covoiturage.covoiturage2.controller;
 
 import com.covoiturage.covoiturage2.entity.Trajet;
 import com.covoiturage.covoiturage2.repository.TrajetRepository;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,5 +82,14 @@ public class TrajetController {
 
         trajetRepository.delete(optionalTrajet.get());
         return ResponseEntity.noContent().build(); // ✅ Retourne 204 No Content après suppression
+    }
+    @GetMapping("/search")
+    public ResponseEntity<List<Trajet>> searchTrajets(
+            @RequestParam(required = false) String startLocation,
+            @RequestParam(required = false) String endLocation,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        List<Trajet> resultats = trajetRepository.search(startLocation, endLocation, date);
+        return ResponseEntity.ok(resultats);
     }
 }

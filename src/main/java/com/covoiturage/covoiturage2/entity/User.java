@@ -1,5 +1,6 @@
 package com.covoiturage.covoiturage2.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -7,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 public class User implements UserDetails {
 

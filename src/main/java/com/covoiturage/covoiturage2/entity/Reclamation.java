@@ -14,20 +14,29 @@ public class Reclamation {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private String reclamationType;
+    private String nomConducteur;
+    private String nomPassager;
+    private String numeroTelephonePassager;
+
+    @Enumerated(EnumType.STRING)
+    private ReclamationStatus status;
+
     private String description;
-    private String status;
     private LocalDateTime createdAt = LocalDateTime.now();
 
     // Constructeurs, getters, et setters
     public Reclamation() {}
 
-    public Reclamation(Long id, User user, String reclamationType, String description, String status, LocalDateTime createdAt) {
+    public Reclamation(Long id, User user, String nomConducteur, String nomPassager,
+                       String numeroTelephonePassager, ReclamationStatus status,
+                       String description, LocalDateTime createdAt) {
         this.id = id;
         this.user = user;
-        this.reclamationType = reclamationType;
-        this.description = description;
+        this.nomConducteur = nomConducteur;
+        this.nomPassager = nomPassager;
+        this.numeroTelephonePassager = numeroTelephonePassager;
         this.status = status;
+        this.description = description;
         this.createdAt = createdAt;
     }
 
@@ -39,16 +48,24 @@ public class Reclamation {
         return user;
     }
 
-    public String getReclamationType() {
-        return reclamationType;
+    public String getNomConducteur() {
+        return nomConducteur;
+    }
+
+    public String getNomPassager() {
+        return nomPassager;
+    }
+
+    public String getNumeroTelephonePassager() {
+        return numeroTelephonePassager;
+    }
+
+    public ReclamationStatus getStatus() {
+        return status;
     }
 
     public String getDescription() {
         return description;
-    }
-
-    public String getStatus() {
-        return status;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -63,16 +80,24 @@ public class Reclamation {
         this.user = user;
     }
 
-    public void setReclamationType(String reclamationType) {
-        this.reclamationType = reclamationType;
+    public void setNomConducteur(String nomConducteur) {
+        this.nomConducteur = nomConducteur;
+    }
+
+    public void setNomPassager(String nomPassager) {
+        this.nomPassager = nomPassager;
+    }
+
+    public void setNumeroTelephonePassager(String numeroTelephonePassager) {
+        this.numeroTelephonePassager = numeroTelephonePassager;
+    }
+
+    public void setStatus(ReclamationStatus status) {
+        this.status = status;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
