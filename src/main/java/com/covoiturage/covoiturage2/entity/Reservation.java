@@ -1,10 +1,12 @@
 package com.covoiturage.covoiturage2.entity;
 
-import com.covoiturage.covoiturage2.entity.BookingStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Reservation {
 
     @Id
@@ -15,27 +17,30 @@ public class Reservation {
     @JoinColumn(name = "passenger_id", nullable = false)
     private User passenger;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trajet_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Trajet trajet;
+
 
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // Champ mis à jour
+    private LocalDateTime updatedAt;
+
     // Constructeurs
     public Reservation() {}
 
-    public Reservation(Long id, User passenger, Trajet trajet, BookingStatus bookingStatus, LocalDateTime createdAt) {
-        this.id = id;
+    public Reservation(User passenger, Trajet trajet, BookingStatus bookingStatus) {
         this.passenger = passenger;
         this.trajet = trajet;
         this.bookingStatus = bookingStatus;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    // Getters and setters
+    // Getters et Setters
     public Long getId() {
         return id;
     }
@@ -75,4 +80,39 @@ public class Reservation {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    // toString() pour faciliter l'affichage
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "id=" + id +
+                ", passenger=" + passenger.getFirstName() + " " + passenger.getLastName() +
+                ", trajet=" + trajet.getStartLocation() + " to " + trajet.getEndLocation() +
+                ", bookingStatus=" + bookingStatus +
+                ", createdAt=" + createdAt +
+                '}';
+    }
+
+    // equals() et hashCode() pour éviter les problèmes dans les collections
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reservation that = (Reservation) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
+

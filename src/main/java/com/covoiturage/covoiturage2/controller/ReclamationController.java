@@ -1,6 +1,7 @@
 package com.covoiturage.covoiturage2.controller;
 
-
+import com.covoiturage.covoiturage2.dto.ReclamationRequest;
+import com.covoiturage.covoiturage2.dto.UpdateStatusRequest;
 import com.covoiturage.covoiturage2.entity.Reclamation;
 import com.covoiturage.covoiturage2.entity.User;
 import com.covoiturage.covoiturage2.repository.UserRepository;
@@ -26,41 +27,35 @@ public class ReclamationController {
     // ✅ Créer une réclamation (conducteur uniquement)
     @PostMapping
     @PreAuthorize("hasRole('CONDUCTEUR')")
-    public ResponseEntity<?> createReclamation(
-            @RequestParam Long conducteurId,
-            @RequestParam String nomConducteur,
-            @RequestParam String nomPassager,
-            @RequestParam String numeroTelephonePassager,
-            @RequestParam String description) {
-
-        Optional<User> conducteur = userRepository.findById(conducteurId);
+    public ResponseEntity<?> createReclamation(@RequestBody ReclamationRequest request) {
+        Optional<User> conducteur = userRepository.findById(request.getConducteurId());
         if (conducteur.isEmpty()) {
             return ResponseEntity.badRequest().body("Conducteur introuvable.");
         }
 
         Reclamation reclamation = new Reclamation();
         reclamation.setUser(conducteur.get());
-        reclamation.setNomConducteur(nomConducteur);
-        reclamation.setNomPassager(nomPassager);
-        reclamation.setNumeroTelephonePassager(numeroTelephonePassager);
-        reclamation.setDescription(description);
+        reclamation.setNomConducteur(request.getNomConducteur());
+        reclamation.setNomPassager(request.getNomPassager());
+        reclamation.setNumeroTelephonePassager(request.getNumeroTelephonePassager());
+        reclamation.setDescription(request.getDescription());
 
         return ResponseEntity.ok(reclamationService.save(reclamation));
     }
 
-    // ✅ Récupérer toutes les réclamations (admin)
+    // ✅ Récupérer toutes les réclamations (admin uniquement)
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Reclamation>> getAll() {
         return ResponseEntity.ok(reclamationService.findAll());
     }
 
-    // ✅ Mettre à jour le statut (admin)
+    // ✅ Mettre à jour le statut d’une réclamation (admin uniquement)
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam String status) {
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
         try {
-            return ResponseEntity.ok(reclamationService.updateStatus(id, status.toUpperCase()));
+            return ResponseEntity.ok(reclamationService.updateStatus(id, request.getStatus().toUpperCase()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Statut invalide.");
         }
