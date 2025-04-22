@@ -32,7 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/reservations/passager/{passengerId}").hasAuthority("ROLE_PASSAGER")
                         .requestMatchers(HttpMethod.PUT, "/reservations/{reservationId}/status").hasAnyAuthority("ROLE_CONDUCTEUR", "ROLE_ADMIN")
 
-                        .requestMatchers("/profile/update").hasAnyAuthority("ADMIN", "CONDUCTEUR") // Utiliser hasAuthority
+                        .requestMatchers("/profile/update").hasAnyRole("CONDUCTEUR", "PASSAGER", "ADMIN")  // Utiliser hasAuthority
 
                         .anyRequest().authenticated()) // Requiert une authentification pour les autres requêtes
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Ajouter le filtre JWT avant le filtre UsernamePasswordAuthenticationFilter

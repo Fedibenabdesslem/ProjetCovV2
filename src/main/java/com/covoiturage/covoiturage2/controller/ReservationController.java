@@ -47,7 +47,8 @@ public class ReservationController {
     // Mettre à jour le statut d'une réservation
     // Mettre à jour le statut d'une réservation
     @PutMapping("/{reservationId}/status")
-    @PreAuthorize("hasAnyAuthority('ROLE_CONDUCTEUR', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CONDUCTEUR', 'ADMIN')")
+
     public ResponseEntity<Reservation> updateReservationStatus(
             @PathVariable Long reservationId,
             @RequestBody BookingStatus status) { // Accepte le statut dans le corps de la requête
