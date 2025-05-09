@@ -26,16 +26,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        System.out.println(request);
+
         String token = extractTokenFromRequest(request);
+
+        System.out.println(token);
 
         // Vérification du token
         if (StringUtils.hasText(token)) {
             try {
                 String email = jwtUtil.extractEmail(token);
+                System.out.println( " email: " + email);
                 String role = jwtUtil.extractRole(token);
 
                 // Vérification de la validité du token
-                if (jwtUtil.validateToken(token, email)) {
+                if (jwtUtil.validateToken(token)) {
                     // Logique d'authentification
                     System.out.println("Token valid, role: " + role + " email: " + email);
                     UsernamePasswordAuthenticationToken authentication = createAuthentication(email, role);

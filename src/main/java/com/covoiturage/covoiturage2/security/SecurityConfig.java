@@ -25,19 +25,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .cors().and()
+                .csrf().disable()
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/auth/signup", "/auth/signin").permitAll() // Permet l'accès à signup et signin sans authentification
-                        .requestMatchers(HttpMethod.POST, "/reservations").hasRole("PASSAGER")// Utiliser hasAuthority au lieu de hasRole
-                        .requestMatchers(HttpMethod.GET, "/reservations/passager/{passengerId}").hasAuthority("ROLE_PASSAGER")
-                        .requestMatchers(HttpMethod.PUT, "/reservations/{reservationId}/status").hasAnyAuthority("ROLE_CONDUCTEUR", "ROLE_ADMIN")
+                        //.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/trajets").hasAuthority("ROLE_CONDUCTEUR") // Autorisation corrigée
+                        .requestMatchers(HttpMethod.GET, "/trajets/**").permitAll()
+                        .anyRequest().permitAll()
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-                        .requestMatchers("/profile/update").hasAnyRole("CONDUCTEUR", "PASSAGER", "ADMIN")  // Utiliser hasAuthority
-
-                        .anyRequest().authenticated()) // Requiert une authentification pour les autres requêtes
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Ajouter le filtre JWT avant le filtre UsernamePasswordAuthenticationFilter
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -56,4 +57,7 @@ public class SecurityConfig {
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtil jwtUtil) {
         return new JwtAuthenticationFilter(jwtUtil); // Définir JwtAuthenticationFilter comme un bean
     }
+
+
+
 }

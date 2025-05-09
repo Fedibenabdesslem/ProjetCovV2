@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -22,10 +23,12 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    // ✅ Modification pour inclure le rôle dans le JWT
-    public String generateToken(String email, String role) {
+    public String generateToken(String email, String role, Long id) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role); // Ajoute le rôle
+        // Format compatible Spring Security
+        claims.put("roles", List.of("ROLE_" + role.toUpperCase()));  // <-- Modification clé ici
+        claims.put("role", role); // Garde l'ancien format pour compatibilité
+        claims.put("userId", id);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -40,12 +43,22 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String extractRole(String token) {
-        return extractClaim(token, claims -> claims.get("role", String.class)); // ✅ Extraction du rôle
+    // Nouvelle méthode pour extraire les authorities Spring
+    public List<String> extractRoles(String token) {
+        return extractClaim(token, claims -> claims.get("roles", List.class));
     }
 
-    public boolean validateToken(String token, String userEmail) {
-        return (userEmail.equals(extractEmail(token)) && !isTokenExpired(token));
+    // Garde l'ancienne méthode pour compatibilité
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
+    }
+
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+
+    public boolean validateToken(String token) {
+        return ( !isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {

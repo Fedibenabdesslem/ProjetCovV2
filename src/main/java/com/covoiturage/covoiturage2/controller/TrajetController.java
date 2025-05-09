@@ -1,8 +1,12 @@
 package com.covoiturage.covoiturage2.controller;
 
 import com.covoiturage.covoiturage2.entity.Trajet;
+import com.covoiturage.covoiturage2.entity.User;
 import com.covoiturage.covoiturage2.repository.TrajetRepository;
+import com.covoiturage.covoiturage2.repository.UserRepository;
+import com.covoiturage.covoiturage2.security.JwtUtil;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,13 +15,20 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/trajets")
 public class TrajetController {
 
-    private final TrajetRepository trajetRepository;
 
+
+
+    private final TrajetRepository trajetRepository;
+    @Autowired
+private JwtUtil jwtUtil ;
+
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     public TrajetController(TrajetRepository trajetRepository) {
         this.trajetRepository = trajetRepository;
@@ -26,11 +37,34 @@ public class TrajetController {
     // 🚗 Seuls les conducteurs peuvent créer un trajet
 
     @PostMapping
-    @PreAuthorize("hasRole('CONDUCTEUR')")
-    public ResponseEntity<Trajet> createTrajet(@RequestBody Trajet trajet) {
-        Trajet savedTrajet = trajetRepository.save(trajet);
-        return ResponseEntity.ok(savedTrajet); // ✅ Retourne un objet Trajet au lieu d'une String
+    //@PreAuthorize("hasRole('CONDUCTEUR')")
+
+    public ResponseEntity<Trajet> createTrajet(@RequestBody Trajet trajet,
+                                               @RequestHeader("Authorization") String authHeader) {
+        // ✅ Extraire le token (en retirant "Bearer ")
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).build(); // Unauthorized si le token est mal formé
+        }
+
+        String token = authHeader.substring(7); // Retire "Bearer "
+
+        try {
+            Long userId = jwtUtil.extractUserId(token);
+            Optional<User> user = userRepository.findById(userId);
+
+            if (user == null) {
+                return ResponseEntity.status(404).build(); // Utilisateur introuvable
+            }
+
+            trajet.setUser(user.get()); // Associer le trajet au conducteur connecté
+            Trajet savedTrajet = trajetRepository.save(trajet);
+
+            return ResponseEntity.ok(savedTrajet);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(null); // Token invalide
+        }
     }
+
 
     // 🔍 Récupérer un trajet spécifique
     @GetMapping("/{id}")
@@ -91,5 +125,18 @@ public class TrajetController {
     ) {
         List<Trajet> resultats = trajetRepository.search(startLocation, endLocation, date);
         return ResponseEntity.ok(resultats);
+    }
+
+
+
+
+    @GetMapping("")
+    public ResponseEntity<List<Trajet>> searchTrajets() {
+      try {
+          return ResponseEntity.status(HttpStatus.OK).body(trajetRepository.findAll());
+
+      }
+      catch (Exception e) { }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }

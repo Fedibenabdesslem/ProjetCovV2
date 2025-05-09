@@ -48,7 +48,7 @@ public class AuthController {
             User user = userOptional.get();
             if (passwordEncoder.matches(password, user.getPassword())) {
                 // Ajout du rôle de l'utilisateur (user.getUserType()) au token
-                String token = jwtUtil.generateToken(email, user.getUserType().name());
+                String token = jwtUtil.generateToken(email, user.getUserType().name(),user.getId());
                 return ResponseEntity.ok(new JwtResponse(token));  // Retourne un token JWT
             }
         }
