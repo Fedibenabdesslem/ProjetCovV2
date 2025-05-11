@@ -127,6 +127,23 @@ private JwtUtil jwtUtil ;
         return ResponseEntity.ok(resultats);
     }
 
+    @GetMapping("/mes-trajets")
+    public ResponseEntity<List<Trajet>> getMesTrajets(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String token = authHeader.substring(7);
+        try {
+            Long userId = jwtUtil.extractUserId(token);
+            List<Trajet> mesTrajets = trajetRepository.findByUserId(userId);
+            return ResponseEntity.ok(mesTrajets);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+
 
 
 
