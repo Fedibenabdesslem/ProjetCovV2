@@ -1,10 +1,12 @@
 package com.covoiturage.covoiturage2.controller;
 
+import com.covoiturage.covoiturage2.dto.TrajetUserDto;
 import com.covoiturage.covoiturage2.entity.Trajet;
 import com.covoiturage.covoiturage2.entity.User;
 import com.covoiturage.covoiturage2.repository.TrajetRepository;
 import com.covoiturage.covoiturage2.repository.UserRepository;
 import com.covoiturage.covoiturage2.security.JwtUtil;
+import com.covoiturage.covoiturage2.service.TrajetService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,19 +24,19 @@ public class TrajetController {
 
 
 
-
-    private final TrajetRepository trajetRepository;
+    @Autowired
+    private  TrajetRepository trajetRepository;
     @Autowired
 private JwtUtil jwtUtil ;
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    public TrajetController(TrajetRepository trajetRepository) {
-        this.trajetRepository = trajetRepository;
-    }
 
-    // 🚗 Seuls les conducteurs peuvent créer un trajet
+
+    @Autowired
+    private TrajetService trajetService ;
+
+
 
     @PostMapping
     //@PreAuthorize("hasRole('CONDUCTEUR')")
@@ -66,15 +68,21 @@ private JwtUtil jwtUtil ;
     }
 
 
-    // 🔍 Récupérer un trajet spécifique
-    @GetMapping("/{id}")
-    public ResponseEntity<Trajet> getTrajetById(@PathVariable Long id) {
-        Optional<Trajet> trajet = trajetRepository.findById(id);
-        return trajet.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build()); // ✅ Retourne 404 si non trouvé
-    }
 
-    // 🚗 Récupérer les trajets d'un conducteur
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getTrajetById(@PathVariable Long id) {
+
+        try{
+            TrajetUserDto trajetUserDto = trajetService.findTrajetUserById(id);
+
+            return ResponseEntity.ok(trajetUserDto);
+
+    }
+        catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }}
+
+
 
     @GetMapping("/conducteur/{id}")
     public ResponseEntity<List<Trajet>> getTrajetsByConducteur(@PathVariable Long id) {

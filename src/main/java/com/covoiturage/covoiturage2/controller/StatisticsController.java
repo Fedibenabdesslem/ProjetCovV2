@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,16 +17,18 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/statistics")
+@CrossOrigin(origins = "http://localhost:4200")
 public class StatisticsController {
 
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private TrajetRepository trajetRepository;
-    //@Autowired
-    //private PaymentRepository paymentRepository;
     @Autowired
     private ReclamationRepository reclamationRepository;
+    // Décommenter l'injection si tu as un PaymentRepository
+    // @Autowired
+    // private PaymentRepository paymentRepository;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('CONDUCTEUR')")
@@ -41,12 +40,12 @@ public class StatisticsController {
             // Statistiques pour l'admin
             long totalUsers = userRepository.count();
             long totalTrajets = trajetRepository.count();
-           // double totalPayments = paymentRepository.sumTotalPayments();
+            // double totalPayments = paymentRepository.sumTotalPayments(); // Décommenter si tu as PaymentRepository
             long totalReclamations = reclamationRepository.count();
 
             stats.put("totalUsers", totalUsers);
             stats.put("totalTrajets", totalTrajets);
-            //stats.put("totalPayments", totalPayments);
+            // stats.put("totalPayments", totalPayments); // Décommenter si tu as PaymentRepository
             stats.put("totalReclamations", totalReclamations);
         }
 
@@ -54,11 +53,11 @@ public class StatisticsController {
         if (hasRoleConducteur(conducteurId)) {
             // Statistiques pour le conducteur
             List<Trajet> topTrajets = trajetRepository.findTopTrajetsByConducteur(conducteurId);
-            //double totalRevenus = paymentRepository.calculateTotalRevenueByConducteur(conducteurId);
+            // double totalRevenus = paymentRepository.calculateTotalRevenueByConducteur(conducteurId); // Décommenter si tu as PaymentRepository
             List<Trajet> trajetsPasses = trajetRepository.findPastTrajetsByConducteur(conducteurId);
 
             stats.put("topTrajets", topTrajets);
-           // stats.put("totalRevenus", totalRevenus);
+            // stats.put("totalRevenus", totalRevenus); // Décommenter si tu as PaymentRepository
             stats.put("trajetsPasses", trajetsPasses);
         }
 
@@ -68,14 +67,14 @@ public class StatisticsController {
     // Vérifier si l'utilisateur a le rôle "ADMIN"
     private boolean hasRoleAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getAuthorities().stream()
+        return authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
     }
 
     // Vérifier si l'utilisateur a le rôle "CONDUCTEUR" et que le conducteurId est valide
     private boolean hasRoleConducteur(Long conducteurId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getAuthorities().stream()
+        return authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_CONDUCTEUR"))
                 && conducteurId != null;
     }

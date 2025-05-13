@@ -1,5 +1,6 @@
 package com.covoiturage.covoiturage2.repository;
 
+import com.covoiturage.covoiturage2.dto.TrajetUserDto;
 import com.covoiturage.covoiturage2.entity.Trajet;
 import org.apache.catalina.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,6 +32,10 @@ public interface TrajetRepository extends JpaRepository<Trajet, Long> {
     @Query("SELECT t FROM Trajet t WHERE t.user.id = :conducteurId AND t.user.userType = 'CONDUCTEUR' AND t.departureTime < CURRENT_TIMESTAMP")
     List<Trajet> findPastTrajetsByConducteur(@Param("conducteurId") Long conducteurId);
     List<Trajet> findByUser(User user);
+
+
+
+
 
 
 }

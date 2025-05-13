@@ -1,5 +1,6 @@
 package com.covoiturage.covoiturage2.service;
 
+import com.covoiturage.covoiturage2.dto.TrajetUserDto;
 import com.covoiturage.covoiturage2.entity.Trajet;
 import com.covoiturage.covoiturage2.repository.TrajetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +46,25 @@ public class TrajetService {
             return true;
         }
         return false;
+    }
+
+
+    public  TrajetUserDto findTrajetUserById(Long id) {
+        Trajet trajet = trajetRepository.findById(id).get();
+        TrajetUserDto trajetUserDto = new TrajetUserDto();
+
+        trajetUserDto.setId(trajet.getId());
+        trajetUserDto.setCreatedAt(trajet.getCreatedAt());
+        trajetUserDto.setDepartureTime(trajet.getDepartureTime());
+        trajetUserDto.setEndLocation(trajet.getEndLocation());
+        trajetUserDto.setStartLocation(trajet.getStartLocation());
+        trajetUserDto.setAvailableSeats(trajet.getAvailableSeats());
+        trajetUserDto.setAllowsLuggage(trajet.isAllowsLuggage());
+        trajetUserDto.setAllowsMusic(trajet.isAllowsMusic());
+        trajetUserDto.setFirstName(trajet.getUser().getFirstName());
+        trajetUserDto.setLastName(trajet.getUser().getLastName());
+        trajetUserDto.setPhoneNumber(trajet.getUser().getPhoneNumber());
+        return trajetUserDto;
+
     }
 }

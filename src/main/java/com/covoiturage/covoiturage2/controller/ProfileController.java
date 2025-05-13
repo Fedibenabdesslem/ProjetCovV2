@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/profile")
 public class ProfileController {
@@ -28,20 +29,17 @@ public class ProfileController {
 
     @PutMapping("/update")
     public ResponseEntity<String> updateProfile(@RequestBody User user, @RequestHeader("Authorization") String token) {
-        // Extraire l'email de l'utilisateur à partir du token JWT
-        String email = jwtUtil.extractEmail(token.substring(7));  // Extraire l'email du token
-
+        String email = jwtUtil.extractEmail(token.substring(7));
         Optional<User> existingUser = userRepository.findByEmail(email);
+
         if (existingUser.isPresent()) {
             User currentUser = existingUser.get();
 
-            // Mettre à jour les informations du profil
             currentUser.setFirstName(user.getFirstName());
             currentUser.setLastName(user.getLastName());
             currentUser.setPhoneNumber(user.getPhoneNumber());
             currentUser.setProfilePicture(user.getProfilePicture());
 
-            // Si l'utilisateur change son mot de passe, l'encoder
             if (user.getPassword() != null && !user.getPassword().isEmpty()) {
                 currentUser.setPassword(passwordEncoder.encode(user.getPassword()));
             }
@@ -52,5 +50,12 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
-}
 
+    // ✅ Nouvelle méthode : récupération d’un utilisateur par ID
+    @GetMapping("/user/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
+}
