@@ -35,6 +35,7 @@ public class TrajetService {
             trajet.setAvailableSeats(trajetDetails.getAvailableSeats());
             trajet.setAllowsLuggage(trajetDetails.isAllowsLuggage());
             trajet.setAllowsMusic(trajetDetails.isAllowsMusic());
+            trajet.setPrice(trajetDetails.getPrice());
             return trajetRepository.save(trajet);
         });
     }
@@ -64,6 +65,7 @@ public class TrajetService {
         trajetUserDto.setFirstName(trajet.getUser().getFirstName());
         trajetUserDto.setLastName(trajet.getUser().getLastName());
         trajetUserDto.setPhoneNumber(trajet.getUser().getPhoneNumber());
+        trajetUserDto.setPrice(trajet.getPrice());
         return trajetUserDto;
 
     }

@@ -29,7 +29,7 @@ public class StatisticsController {
     @Autowired
     private ReclamationRepository reclamationRepository;
 
-    // --- Endpoint pour les statistiques ADMIN ---
+
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getAdminStatistics() {
@@ -43,7 +43,6 @@ public class StatisticsController {
         return ResponseEntity.ok(stats);
     }
 
-    // --- Endpoint pour les statistiques CONDUCTEUR ---
     @GetMapping("/conducteur")
     @PreAuthorize("hasRole('CONDUCTEUR')")
     public ResponseEntity<ConducteurStatisticsDTO> getConducteurStatistics(@RequestParam Long conducteurId) {

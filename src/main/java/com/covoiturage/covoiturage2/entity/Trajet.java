@@ -19,6 +19,8 @@ public class Trajet {
     private LocalDateTime departureTime;
     private int availableSeats;
     private LocalDateTime createdAt = LocalDateTime.now();
+    private Double price;
+
 
     private boolean allowsLuggage; // Autorisation des bagages
     private boolean allowsMusic; // Autorisation de la musique
@@ -35,6 +37,7 @@ public class Trajet {
         this.availableSeats = availableSeats;
         this.allowsLuggage = allowsLuggage;
         this.allowsMusic = allowsMusic;
+        this.price = price;
     }
 
     // Getters and setters
@@ -74,6 +77,8 @@ public class Trajet {
         return allowsMusic;
     }
 
+    public double getPrice() { return price;}
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -108,5 +113,9 @@ public class Trajet {
 
     public void setAllowsMusic(boolean allowsMusic) {
         this.allowsMusic = allowsMusic;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }
