@@ -23,19 +23,17 @@ import java.util.Optional;
 public class TrajetController {
 
 
-
     @Autowired
-    private  TrajetRepository trajetRepository;
+    private TrajetRepository trajetRepository;
     @Autowired
-private JwtUtil jwtUtil ;
+    private JwtUtil jwtUtil;
 
     @Autowired
     private UserRepository userRepository;
 
 
     @Autowired
-    private TrajetService trajetService ;
-
+    private TrajetService trajetService;
 
 
     @PostMapping
@@ -68,20 +66,18 @@ private JwtUtil jwtUtil ;
     }
 
 
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getTrajetById(@PathVariable Long id) {
 
-        try{
+        try {
             TrajetUserDto trajetUserDto = trajetService.findTrajetUserById(id);
 
             return ResponseEntity.ok(trajetUserDto);
 
-    }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(500).build();
-        }}
-
+        }
+    }
 
 
     @GetMapping("/conducteur/{id}")
@@ -125,6 +121,7 @@ private JwtUtil jwtUtil ;
         trajetRepository.delete(optionalTrajet.get());
         return ResponseEntity.noContent().build(); // ✅ Retourne 204 No Content après suppression
     }
+
     @GetMapping("/search")
     public ResponseEntity<List<Trajet>> searchTrajets(
             @RequestParam(required = false) String startLocation,
@@ -152,16 +149,23 @@ private JwtUtil jwtUtil ;
     }
 
 
+    @PreAuthorize("hasRole('ADMIN')")
 
-
-
-    @GetMapping("")
-    public ResponseEntity<List<Trajet>> searchTrajets() {
-      try {
-          return ResponseEntity.status(HttpStatus.OK).body(trajetRepository.findAll());
-
-      }
-      catch (Exception e) { }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllTrajetsForAdmin() {
+        try {
+            return ResponseEntity.ok(trajetRepository.count());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @GetMapping("/all")
+    public ResponseEntity<List<Trajet>> getAllTrajets() {
+        try {
+            List<Trajet> trajets = trajetRepository.findAll();
+            return ResponseEntity.ok(trajets);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

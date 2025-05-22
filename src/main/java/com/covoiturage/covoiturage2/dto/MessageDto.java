@@ -6,7 +6,7 @@ public class MessageDto {
     private Long trajetId;
     private String messageContent;
 
-    // Getters & Setters
+
 
     public Long getSenderId() {
         return senderId;

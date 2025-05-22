@@ -33,6 +33,8 @@ public interface TrajetRepository extends JpaRepository<Trajet, Long> {
     List<Trajet> findPastTrajetsByConducteur(@Param("conducteurId") Long conducteurId);
     List<Trajet> findByUser(User user);
 
+    long count();
+
 
 
 
